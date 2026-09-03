@@ -379,21 +379,21 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		//g.setColor(Color.BLUE);
 		//g.drawLine(clickX, clickY, mouseX, mouseY);
-		
+		/*
 		g.setColor(Color.blue);
 		g.fillRect((int)q1x,(int)q1y, 10, 10);
 		
 		g.setColor(new Color(0,128,0));
 		g.fillRect((int)q2x,(int)q2y, 10, 10);
-		
+		*/
 		g.setColor(Color.black);
 		g.drawString("FPS "+fps+" mouse: "+mouseX+","+mouseY, 10, 25);
 	}
 	
 	public void bresenhamAlgorithm(int x1, int y1, int x2, int y2) {
 		int pospix = y1*(W*4)+x1*4;
-		float m = (float)(y2-y1)/(x2-x1);
-		float slope_error = -0.5f;
+		int m = 2 * (y2-y1);
+		int slope_error = m - (x2-x1);
 
 		for(int x = x1; x < x2; x++) {
 			// Desenhando o pixel
@@ -409,7 +409,7 @@ public class MainCanvas extends JPanel implements Runnable{
 			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
 			if(slope_error >= 0) {
 				pospix += W*4; // Avançando o pixel verticalmente
-				slope_error -= 1.0f;  // Resetando o erro da inclinação
+				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
 		}
 	}
