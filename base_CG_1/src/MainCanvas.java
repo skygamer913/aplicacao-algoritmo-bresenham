@@ -338,11 +338,11 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
 		
+		bresenhamAlgorithm((int)posx-100,(int)posy,(int)posx+100,(int)posy+100);
+
 		//desenhaLinhaHorizontal((int)posx-100,(int)posy,200);
 		
 		//desenhaLinhaVertical((int)posx,(int)posy-100,200);
-		
-		
 		
 		//desenhaLinhaVertical(300,200,200);
 		
@@ -390,6 +390,30 @@ public class MainCanvas extends JPanel implements Runnable{
 		g.drawString("FPS "+fps+" mouse: "+mouseX+","+mouseY, 10, 25);
 	}
 	
+	public void bresenhamAlgorithm(int x1, int y1, int x2, int y2) {
+		int pospix = y1*(W*4)+x1*4;
+		float m = (float)(y2-y1)/(x2-x1);
+		float slope_error = -0.5f;
+
+		for(int x = x1; x < x2; x++) {
+			// Desenhando o pixel
+			bufferDeVideo[pospix] = (byte)255;
+			bufferDeVideo[pospix+1] = (byte)0;
+			bufferDeVideo[pospix+2] = (byte)0;
+			bufferDeVideo[pospix+3] = (byte)0;
+			
+			pospix += 4;  // Avançando o pixel horizontalmente
+
+			slope_error += m;  // Atualizando o erro da inclinação
+			
+			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
+			if(slope_error >= 0) {
+				pospix += W*4; // Avançando o pixel verticalmente
+				slope_error -= 1.0f;  // Resetando o erro da inclinação
+			}
+		}
+	}
+
 	public void desenhaLinhaHorizontal(int x, int y,int w) {
 		int pospix = y*(W*4)+x*4;
 		
