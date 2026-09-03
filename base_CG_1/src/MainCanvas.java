@@ -1,4 +1,3 @@
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -9,10 +8,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Random;
 
@@ -69,8 +65,7 @@ public class MainCanvas extends JPanel implements Runnable{
 	public MainCanvas() {
 		
 		File f = new File("base_CG_1/imgbmp.bmp");
-		try {
-			FileInputStream fin = new FileInputStream(f);
+		try (java.io.FileInputStream fin = new java.io.FileInputStream(f)) {
 
 			byte todosodbytes[] = new byte[64000];
 			int byteslidos = fin.read(todosodbytes);
@@ -78,8 +73,6 @@ public class MainCanvas extends JPanel implements Runnable{
 			for(int i = 0; i < byteslidos;i++) {
 				System.out.println(i+": "+todosodbytes[i]);
 			}
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -336,11 +329,13 @@ public class MainCanvas extends JPanel implements Runnable{
 			bufferDeVideo[i] = 0;
 		}
 		
-		drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
+		//drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
 		
-		bresenhamAlgorithm((int)posx,(int)posy,(int)posx+100,(int)posy+100);
+		bresenhamAlgorithm(50, 50, 250, 150);
+		bresenhamAlgorithm(50, 100, 100, 400);
+		bresenhamAlgorithm(75, 200, 250, 150);
 
-		//desenhaLinhaHorizontal((int)posx-100,(int)posy,200);
+		//desenhaLinhaHorizontal(10,100,200);
 		
 		//desenhaLinhaVertical((int)posx,(int)posy-100,200);
 		
@@ -372,6 +367,7 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		g.setColor(Color.white);
 		g.fillRect(0, 0, 640, 480);
+		g.drawImage(imageBuffer, 0, 0, null);
 //		g.setColor(Color.black);
 //		g.drawLine(0, 0, 640, 480);
 		
@@ -395,10 +391,10 @@ public class MainCanvas extends JPanel implements Runnable{
 		int m = 2 * (y2-y1);
 		int slope_error = m - (x2-x1);
 
-		for(int x = x1; x < x2; x++) {
+		for(int x = x1; x <= x2; x++) {
 			// Desenhando o pixel
 			bufferDeVideo[pospix] = (byte)255;
-			bufferDeVideo[pospix+1] = (byte)0;
+			bufferDeVideo[pospix+1] = (byte)255;
 			bufferDeVideo[pospix+2] = (byte)0;
 			bufferDeVideo[pospix+3] = (byte)0;
 			
@@ -408,6 +404,7 @@ public class MainCanvas extends JPanel implements Runnable{
 			
 			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
 			if(slope_error >= 0) {
+				y++;
 				pospix += W*4; // Avançando o pixel verticalmente
 				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
@@ -482,6 +479,7 @@ public class MainCanvas extends JPanel implements Runnable{
 			posx += vel*difS;
 		}
 		
+		/*
 		q1x+=0.2;
 		//q2x=q2x+100*diftime/1000.0f;
 		float dx = mouseX-q2x;
@@ -491,6 +489,7 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		q2x = (float)(q2x+Math.cos(ang)*100*diftime/1000.0f);
 		q2y = (float)(q2y+Math.sin(ang)*100*diftime/1000.0f);
+		*/
 	}
 	
 	
