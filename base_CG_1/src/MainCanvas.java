@@ -332,8 +332,9 @@ public class MainCanvas extends JPanel implements Runnable{
 		//drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
 		
 		bresenhamAlgorithm(50, 50, 250, 150);
-		bresenhamAlgorithm(50, 100, 100, 400);
-		bresenhamAlgorithm(75, 200, 250, 150);
+		bresenhamAlgorithm(50, 100, 100, 300);
+		bresenhamAlgorithm(75, 200, 250, 100);
+		bresenhamAlgorithm(300, 50, 600, 400);
 
 		//desenhaLinhaHorizontal(10,100,200);
 		
@@ -404,7 +405,6 @@ public class MainCanvas extends JPanel implements Runnable{
 			
 			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
 			if(slope_error >= 0) {
-				y++;
 				pospix += W*4; // Avançando o pixel verticalmente
 				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
