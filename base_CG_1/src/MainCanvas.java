@@ -68,7 +68,7 @@ public class MainCanvas extends JPanel implements Runnable{
 	
 	public MainCanvas() {
 		
-		File f = new File("imgbmp.bmp");
+		File f = new File("base_CG_1/imgbmp.bmp");
 		try {
 			FileInputStream fin = new FileInputStream(f);
 
@@ -96,13 +96,13 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		
 //		try {
-//			imgtmp = ImageIO.read(getClass().getResource("fundo.jpg"));
+//			imgtmp = ImageIO.read(getClass().getResource("base_CG_1/fundo.jpg"));
 //			System.out.println(""+imgtmp.toString());
 //		} catch (IOException e1) {
 //			e1.printStackTrace();
 //		}
 		
-		imgtmp = loadImage("fundo.jpg");
+		imgtmp = loadImage("base_CG_1/fundo.jpg");
 		
 		imageBuffer = new BufferedImage(640,480, BufferedImage.TYPE_4BYTE_ABGR);
 		//imageBuffer.getGraphics().drawImage(imgtmp, 0, 0, null);
@@ -113,7 +113,7 @@ public class MainCanvas extends JPanel implements Runnable{
 		System.out.println("Buffer SIZE "+bufferDeVideo.length );
 		
 		
-//		File f = new File("t1.bmp");
+//		File f = new File("base_CG_1/t1.bmp");
 //		try {
 //			DataInputStream din = new DataInputStream(new FileInputStream(f));
 //			byte b[] = new byte[128];
@@ -338,7 +338,7 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
 		
-		bresenhamAlgorithm((int)posx-100,(int)posy,(int)posx+100,(int)posy+100);
+		bresenhamAlgorithm((int)posx,(int)posy,(int)posx+100,(int)posy+100);
 
 		//desenhaLinhaHorizontal((int)posx-100,(int)posy,200);
 		
