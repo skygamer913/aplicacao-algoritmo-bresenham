@@ -11,7 +11,6 @@ import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
-
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
@@ -331,6 +330,7 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		//drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
 		
+		// Desenhando linhas usando o algoritmo de Bresenham
 		bresenhamAlgorithm(50, 50, 250, 150);
 		bresenhamAlgorithm(50, 100, 100, 300);
 		bresenhamAlgorithm(75, 200, 250, 100);
@@ -387,6 +387,7 @@ public class MainCanvas extends JPanel implements Runnable{
 		g.drawString("FPS "+fps+" mouse: "+mouseX+","+mouseY, 10, 25);
 	}
 	
+	// Procedimento de Bresenham para desenhar uma linha entre os pontos (x1, y1) e (x2, y2)
 	public void bresenhamAlgorithm(int x1, int y1, int x2, int y2) {
 		int pospix = y1*(W*4)+x1*4;
 		int m = 2 * (y2-y1);
