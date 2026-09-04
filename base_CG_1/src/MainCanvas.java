@@ -335,26 +335,6 @@ public class MainCanvas extends JPanel implements Runnable{
 		bresenhamAlgorithm(50, 100, 100, 300);
 		bresenhamAlgorithm(75, 200, 250, 100);
 		bresenhamAlgorithm(300, 50, 600, 400);
-
-		//desenhaLinhaHorizontal(10,100,200);
-		
-		//desenhaLinhaVertical((int)posx,(int)posy-100,200);
-		
-		//desenhaLinhaVertical(300,200,200);
-		
-		// TODO Auto-generated method stub
-		//super.paint(g);
-		
-//		for(int i = 0; i < bufferDeVideo.length;i+=4){
-//			int rr = rand.nextInt(255);
-//			int gg = rand.nextInt(255);
-//			int bb = rand.nextInt(255);
-//			
-//			bufferDeVideo[i] = (byte)0x00ff;
-//			bufferDeVideo[i+1] = (byte)(0x00ff&bb);
-//			bufferDeVideo[i+2] = (byte)(0x00ff&gg);
-//			bufferDeVideo[i+3] = (byte)(0x00ff&rr);
-//		}
 		
 		/*for(int i = 0; i < memoriaPlacaVideo.length;i++){
 			int bufferindex = i*4;
@@ -369,20 +349,7 @@ public class MainCanvas extends JPanel implements Runnable{
 		g.setColor(Color.white);
 		g.fillRect(0, 0, 640, 480);
 		g.drawImage(imageBuffer, 0, 0, null);
-//		g.setColor(Color.black);
-//		g.drawLine(0, 0, 640, 480);
-		
-		//g.drawImage(imageBuffer,0,0,null);
-		
-		//g.setColor(Color.BLUE);
-		//g.drawLine(clickX, clickY, mouseX, mouseY);
-		/*
-		g.setColor(Color.blue);
-		g.fillRect((int)q1x,(int)q1y, 10, 10);
-		
-		g.setColor(new Color(0,128,0));
-		g.fillRect((int)q2x,(int)q2y, 10, 10);
-		*/
+
 		g.setColor(Color.black);
 		g.drawString("FPS "+fps+" mouse: "+mouseX+","+mouseY, 10, 25);
 	}
@@ -410,6 +377,11 @@ public class MainCanvas extends JPanel implements Runnable{
 				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
 		}
+	}
+
+	public void operacaoTranslacao(int , int dy) {
+		posx += dx;
+		posy += dy;
 	}
 
 	public void desenhaLinhaHorizontal(int x, int y,int w) {
