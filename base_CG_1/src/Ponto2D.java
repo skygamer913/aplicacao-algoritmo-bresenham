@@ -26,5 +26,8 @@ public class Ponto2D {
         this.pY = pY;
     }
 
+    public int positionCalculation(int width, int channel) {
+        return this.pY * (width * channel) + this.pX * channel;
+    }
     
 }
