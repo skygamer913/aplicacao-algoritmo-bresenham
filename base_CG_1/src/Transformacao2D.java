@@ -2,24 +2,19 @@ import java.lang.Math;
 
 public class Transformacao2D {
     // atributos
-    private int[][] matTFinal;
-    private int[][] matT;
+    private int[] matFinal;
     private int[] matPonto;
     private boolean isTransformed;
 
     // Construtor
     public Transformacao2D(int x, int y) {        
         this.matPonto = new int[3];
-        this.matTFinal = new int[3][3];
-        this.matT = new int[3][3];
+        this.matFinal = new int[9];
         this.isTransformed = false;
 
         // Valores inicias da matriz de transformação
-        for(int i = 0; i < 3; i++) {
-            for(int j = 0; j < 3; j++) {
-                this.matTFinal[i][j] = 0;
-                this.matT[i][j] = 0;
-            }
+        for(int i = 0; i < 9; i++) {
+            this.matFinal[i] = 0;
         }
 
         // Valores iniciais das matrizes
@@ -29,27 +24,18 @@ public class Transformacao2D {
     }
 
     // Método para multiplicar duas matrizes 3x3
-    private void multMatrices(int[][] matA, int[][] matB) {
-        int[][] result = new int[3][3];
+    private void updateMatrix(int[] matA, int[] matB) {
+        int[] result = new int[9];
 
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
                 for(int k = 0; k < 3; k++) {
-                    result[i][j] += matA[i][k] * matB[k][j];
+                    result[i*3+j] += matA[i*3+k] * matB[k*3+j];
                 }
             }
         }
 
-        this.matTFinal = result;  // Atualiza a matriz de transformação
-    }
-
-    // Função de reiniciar a matriz
-    private void resetMatrixT() {
-        for(int i = 0; i < 2; i++) {
-            for(int j = 0; j < 3; j++) {
-                this.matT[i][j] = 0; 
-            }
-        }
+        this.matFinal = result;  // Atualiza a matriz de transformação
     }
 
     // Método para aplicar a transformação ao ponto
@@ -58,7 +44,7 @@ public class Transformacao2D {
         int[] matAux = new int[3];
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
-                matAux[i] += this.matTFinal[i][j] * this.matPonto[j];
+                matAux[i] += this.matFinal[i*3+j] * this.matPonto[j];
             }
         }
 
@@ -68,67 +54,85 @@ public class Transformacao2D {
     // Método para aplicar a translação
     public void translate(int a, int b) {
         // Gerando a matriz translate
-        for(int i = 0; i < 3; i++) {
-            this.matT[i][i] = 1;
-        }
-        this.matT[0][2] = a;
-        this.matT[1][2] = b;
+        int[] matTranslate = {
+            1, 0, a,
+            0, 1, b,
+            0, 0, 1,
+        };
         
         // Verifica se já ocorreu alguma operação de transformação antes
         if(!isTransformed) {
-            this.matTFinal = matT;  // A matriz final recebe a matriz de translação
+            this.matFinal = matTranslate;  // A matriz final recebe a matriz de translação
 
             this.isTransformed = true;  // Marca que a transformação foi aplicada
             return;  // Sai do método após aplicar a primeira transformação
-        } else {
-            // Multiplicação das matrizes
-            multMatrices(matTFinal, matT);
         }
-
-        resetMatrixT(); // Reseta a matriz
+        // Multiplicação das matrizes
+        updateMatrix(matFinal, matTranslate);
     }
 
     // Método de operação de rotação
     public void rotation(double ang) {
         // Gerando a matriz de rotação
-        this.matT[0][0] = (int)(Math.cos(ang));
-        this.matT[0][1] = (int)(Math.sin(ang));
-
-        this.matT[1][1] = matT[0][0];
-        this.matT[1][0] = matT[0][1] * -1;
+        float cosAng = (float)(Math.cos(ang));
+        float sinAng = (float)(Math.sin(ang));
+        int[] matRotation = {
+            Math.round(cosAng), Math.round(sinAng), 0,
+            Math.round(sinAng) * (-1), Math.round(cosAng), 0,
+            0, 0, 1
+        };
 
         // Verifica se já ocorreu alguma operação de transformação antes
         if(!isTransformed) {
-            this.matTFinal = matT;  // A matriz final recebe a matriz de translação
-
+            this.matFinal = matRotation;  // A matriz final recebe a matriz de rotação
             this.isTransformed = true;  // Marca que a transformação foi aplicada
+
             return;  // Sai do método após aplicar a primeira transformação
-        } else {
-            // Multiplicação das matrizes
-            multMatrices(matTFinal, matT);
         }
 
-        resetMatrixT(); // Reseta a matriz
+        // Multiplicação das matrizes
+        updateMatrix(matFinal, matRotation);
     }
 
     // Método de operção de escala
     public void scale(int a, int b) {
         // Gerando a matriz de escala
-        this.matT[0][0] = a;
-        this.matT[1][1] = b;
-        this.matT[2][2] = 1; 
+        int[] matScale = {
+            a, 0, 0,
+            0, b, 0,
+            0, 0, 1
+        };
         
         // Verifica se já ocorreu alguma operação de transformação antes
         if(!isTransformed) {
-            this.matTFinal = matT;  // A matriz final recebe a matriz de translação
-
+            this.matFinal = matScale;  // A matriz final recebe a matriz de escala
             this.isTransformed = true;  // Marca que a transformação foi aplicada
-        } else {
-            // Multiplicação das matrizes
-            multMatrices(matTFinal, matT);
+
+            return;  // Retorna a operação
+        }
+        // Multiplicação das matrizes
+        updateMatrix(matFinal, matScale);
+    }
+
+    // Método de shear
+    public void shear(int a, int b) {
+        // Gerando a matriz de shear
+        int[] matShear = {
+            1, a, 0,
+            b, 1, 0,
+            0, 0, 1
+        };
+
+        // Verifica se já ocorreu alguma operação de transformação
+        if (!isTransformed) {
+            this.matFinal = matShear;  // A matriz final recebe a matriz de Shear
+            this.isTransformed = true;  // Marca que obteve uma transformação
+
+            return;  // Retorna o método
         }
 
-        resetMatrixT();
+        // Multiplicação para a matriz de transformação final
+        updateMatrix(matShear, matFinal);
     }
 
 }
