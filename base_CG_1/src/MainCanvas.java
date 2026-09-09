@@ -379,11 +379,6 @@ public class MainCanvas extends JPanel implements Runnable{
 		}
 	}
 
-	public void operacaoTranslacao(int , int dy) {
-		posx += dx;
-		posy += dy;
-	}
-
 	public void desenhaLinhaHorizontal(int x, int y,int w) {
 		int pospix = y*(W*4)+x*4;
 		
