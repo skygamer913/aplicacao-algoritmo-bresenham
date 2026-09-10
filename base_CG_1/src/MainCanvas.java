@@ -58,8 +58,8 @@ public class MainCanvas extends JPanel implements Runnable{
 	float filtroG = 1;
 	float filtroB = 1;
 	
-	float q1x = 10,q1y = 100;
-	float q2x = 10,q2y = 200;
+	Ponto2D p0 = null;
+	Ponto2D p1 = null;
 	
 	public MainCanvas() {
 		
@@ -330,11 +330,22 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		//drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
 		
+		p0 = new Ponto2D(50, 50);
+		p1 = new Ponto2D(250, 150);
+
 		// Desenhando linhas usando o algoritmo de Bresenham
-		bresenhamAlgorithm(50, 50, 250, 150);
-		bresenhamAlgorithm(50, 100, 100, 300);
-		bresenhamAlgorithm(75, 200, 250, 100);
-		bresenhamAlgorithm(300, 50, 600, 400);
+		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+		
+		p0.setpX(250); p0.setpY(350); p1.setpX(100); p1.setpY(50);
+		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+
+		// y1 > y2
+		p0.setpX(75); p0.setpY(200); p1.setpX(250); p1.setpY(100);
+		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+
+		// x1 > x2
+		p0.setpX(600); p0.setpY(50); p1.setpX(300); p1.setpY(400);
+		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
 		
 		/*for(int i = 0; i < memoriaPlacaVideo.length;i++){
 			int bufferindex = i*4;
@@ -356,24 +367,37 @@ public class MainCanvas extends JPanel implements Runnable{
 	
 	// Procedimento de Bresenham para desenhar uma linha entre os pontos (x1, y1) e (x2, y2)
 	public void bresenhamAlgorithm(int x1, int y1, int x2, int y2) {
+		int dirX = 1;
+		int dirY = 1;
+
+		// Se o x1 > x2, a linha vai avançar para a esquerda
+		if(x1 > x2) {
+			dirX = -1; 
+		}
+
+		// Se o y1 > y2, a linha vai subir
+		if(y1 > y2) {
+			dirY = -1;
+		}
+
 		int pospix = y1*(W*4)+x1*4;
 		int m = 2 * (y2-y1);
 		int slope_error = m - (x2-x1);
 
-		for(int x = x1; x <= x2; x++) {
+		for(int x = x1; x != x2; x+=dirX) {
 			// Desenhando o pixel
 			bufferDeVideo[pospix] = (byte)255;
 			bufferDeVideo[pospix+1] = (byte)255;
 			bufferDeVideo[pospix+2] = (byte)0;
 			bufferDeVideo[pospix+3] = (byte)0;
 			
-			pospix += 4;  // Avançando o pixel horizontalmente
+			pospix += 4 * dirX;  // Avançando o pixel horizontalmente
 
 			slope_error += m;  // Atualizando o erro da inclinação
 			
 			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
 			if(slope_error >= 0) {
-				pospix += W*4; // Avançando o pixel verticalmente
+				pospix += (W*4) * dirY; // Avançando o pixel verticalmente
 				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
 		}
@@ -446,18 +470,6 @@ public class MainCanvas extends JPanel implements Runnable{
 		if(RIGHT) {
 			posx += vel*difS;
 		}
-		
-		/*
-		q1x+=0.2;
-		//q2x=q2x+100*diftime/1000.0f;
-		float dx = mouseX-q2x;
-		float dy = mouseY-q2y;
-		
-		double ang = Math.atan2(dy, dx);
-		
-		q2x = (float)(q2x+Math.cos(ang)*100*diftime/1000.0f);
-		q2y = (float)(q2y+Math.sin(ang)*100*diftime/1000.0f);
-		*/
 	}
 	
 	
