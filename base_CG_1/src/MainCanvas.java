@@ -10,12 +10,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-
-import java.util.Arrays;
-import java.util.ArrayList;
 
 public class MainCanvas extends JPanel implements Runnable{
 	int W = 640;
@@ -402,7 +400,7 @@ public class MainCanvas extends JPanel implements Runnable{
 			
 			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
 			if(slope_error >= 0) {
-				pospix += (W*4) * dirY; // Avançando o pixel verticalmente
+				pospix += (W*4)*dirY; // Avançando o pixel verticalmente
 				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
 		}
@@ -415,17 +413,15 @@ public class MainCanvas extends JPanel implements Runnable{
 		if(trans2D == null)
 			trans2D = new Transformacao2D(0, 0);
 
-		trans2D.scale(5, 5);
-		trans2D.translate(-10, -10);
+		trans2D.translate(-W, -H);
+		trans2D.rotation(90);
+		trans2D.translate(W, H);
 
 		for(int y = 0; y <= H; y++) {
 			for(int x = 0; x <= W; x++) {
 				pospix = y*(W*4)+x*4;
-				if (bufferDeVideo[pospix] == (byte)0) {
-					continue;
-				} else {
+				if (bufferDeVideo[pospix] != (byte)0)
 					posList.add(new Ponto2D(x, y));
-				}
 			}
 		}
 
