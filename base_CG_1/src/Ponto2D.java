@@ -26,8 +26,11 @@ public class Ponto2D {
         this.pY = pY;
     }
 
-    public int positionCalculation(int width, int channel) {
+    public int posCalculation(int width, int channel) {
         return this.pY * (width * channel) + this.pX * channel;
     }
-    
+
+    public boolean isValidCoordenates(int width, int height) {
+        return (this.pX >= 0 && this.pY >= 0) && (this.pX <= width && this.pY <= height);
+    }
 }
