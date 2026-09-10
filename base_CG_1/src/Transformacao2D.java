@@ -38,6 +38,17 @@ public class Transformacao2D {
         this.matFinal = result;  // Atualiza a matriz de transformação
     }
 
+    public void resetMatrix() {
+        for(int i = 0; i < 9; i++) {
+            this.matFinal[i] = 0;
+        }
+    }
+
+    public  void changePoint(int new_x, int new_y) {
+        this.matPonto[0] = new_x;
+        this.matPonto[1] = new_y;
+    }
+
     // Método para aplicar a transformação ao ponto
     public Ponto2D applyTransformation() {
         // Multiplicação da matriz de transformação pelo ponto

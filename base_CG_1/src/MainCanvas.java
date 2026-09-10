@@ -14,6 +14,9 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import java.util.Arrays;
+import java.util.ArrayList;
+
 public class MainCanvas extends JPanel implements Runnable{
 	int W = 640;
 	int H = 480;
@@ -60,6 +63,8 @@ public class MainCanvas extends JPanel implements Runnable{
 	
 	Ponto2D p0 = null;
 	Ponto2D p1 = null;
+
+	Transformacao2D trans2D = null;
 	
 	public MainCanvas() {
 		
@@ -401,6 +406,35 @@ public class MainCanvas extends JPanel implements Runnable{
 				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
 		}
+	}
+
+	public void aplicarTransformacoes() {
+		int pospix;
+		ArrayList<Ponto2D> posList = new ArrayList<>();
+		
+		if(trans2D == null)
+			trans2D = new Transformacao2D(0, 0);
+
+		trans2D.scale(5, 5);
+		trans2D.translate(-10, -10);
+
+		for(int y = 0; y <= H; y++) {
+			for(int x = 0; x <= W; x++) {
+				pospix = y*(W*4)+x*4;
+				if (bufferDeVideo[pospix] == (byte)0) {
+					continue;
+				} else {
+					posList.add(new Ponto2D(x, y));
+				}
+			}
+		}
+
+		for (Ponto2D ponto : posList) {
+			pospix = ponto.posCalculation(W, 4);
+			trans2D.changePoint(ponto.getpX(), ponto.getpY());
+
+		}
+
 	}
 
 	public void desenhaLinhaHorizontal(int x, int y,int w) {
