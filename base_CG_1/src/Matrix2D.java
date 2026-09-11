@@ -1,15 +1,15 @@
 import java.lang.Math;
 
-public class Transformacao2D {
+public class Matrix2D {
     // atributos
-    private int[] matFinal;
-    private int[] matPonto;
+    private float[] matFinal;
+    private float[] matPonto;
     private boolean isTransformed;
 
     // Construtor
-    public Transformacao2D(int x, int y) {        
-        this.matPonto = new int[3];
-        this.matFinal = new int[9];
+    public Matrix2D(int x, int y) {        
+        this.matPonto = new float[3];
+        this.matFinal = new float[9];
         this.isTransformed = false;
 
         // Valores inicias da matriz de transformação
@@ -24,8 +24,8 @@ public class Transformacao2D {
     }
 
     // Método para multiplicar duas matrizes 3x3
-    private void updateMatrix(int[] matA, int[] matB) {
-        int[] result = new int[9];
+    private void updateMatrix(float[] matA, float[] matB) {
+        float[] result = new float[9];
 
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
@@ -44,28 +44,31 @@ public class Transformacao2D {
         }
     }
 
-    public  void changePoint(int new_x, int new_y) {
+    public void changePoint(int new_x, int new_y) {
         this.matPonto[0] = new_x;
         this.matPonto[1] = new_y;
     }
 
     // Método para aplicar a transformação ao ponto
-    public Ponto2D applyTransformation() {
+    public int[] applyTransformation() {
         // Multiplicação da matriz de transformação pelo ponto
-        int[] matAux = new int[3];
+        int[] result = new int[2];
+        float[] matAux = new float[3];
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
                 matAux[i] += this.matFinal[i*3+j] * this.matPonto[j];
             }
         }
+        result[0] = Math.round(matAux[0]);
+        result[1] = Math.round(matAux[1]);
 
-        return new Ponto2D(matAux[0], matAux[1]);  // Retorna o ponto transformado
+        return result;  // Retorna o ponto transformado
     } 
 
     // Método para aplicar a translação
-    public void translate(int a, int b) {
+    public void translate(float a, float b) {
         // Gerando a matriz translate
-        int[] matTranslate = {
+        float[] matTranslate = {
             1, 0, a,
             0, 1, b,
             0, 0, 1,
@@ -87,9 +90,11 @@ public class Transformacao2D {
         // Gerando a matriz de rotação
         float cosAng = (float)(Math.cos(ang));
         float sinAng = (float)(Math.sin(ang));
-        int[] matRotation = {
-            Math.round(cosAng), Math.round(sinAng), 0,
-            Math.round(sinAng) * (-1), Math.round(cosAng), 0,
+        
+        // Matriz de rotação
+        float[] matRotation = {
+            (float) cosAng, (float) sinAng, 0,
+            (float) sinAng * (-1), (float) cosAng, 0,
             0, 0, 1
         };
 
@@ -106,9 +111,9 @@ public class Transformacao2D {
     }
 
     // Método de operção de escala
-    public void scale(int a, int b) {
+    public void scale(float a, float b) {
         // Gerando a matriz de escala
-        int[] matScale = {
+        float[] matScale = {
             a, 0, 0,
             0, b, 0,
             0, 0, 1
@@ -126,9 +131,9 @@ public class Transformacao2D {
     }
 
     // Método de shear
-    public void shear(int a, int b) {
+    public void shear(float a, float b) {
         // Gerando a matriz de shear
-        int[] matShear = {
+        float[] matShear = {
             1, a, 0,
             b, 1, 0,
             0, 0, 1

@@ -10,10 +10,13 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+import javax.swing.plaf.basic.BasicListUI.ListSelectionHandler;
+
+import java.util.Arrays;
+import java.util.ArrayList;
 
 public class MainCanvas extends JPanel implements Runnable{
 	int W = 640;
@@ -62,7 +65,10 @@ public class MainCanvas extends JPanel implements Runnable{
 	Ponto2D p0 = null;
 	Ponto2D p1 = null;
 
-	Transformacao2D trans2D = null;
+	Linha2D l0 = null;
+	Linha2D l1 = null;
+	Linha2D l2 = null;
+	Linha2D l3 = null;
 	
 	public MainCanvas() {
 		
@@ -80,7 +86,6 @@ public class MainCanvas extends JPanel implements Runnable{
 		}
 		
 		
-		
 		setSize(640,480);
 		setFocusable(true);
 		
@@ -88,14 +93,6 @@ public class MainCanvas extends JPanel implements Runnable{
 		Altura = 480;
 		
 		pixelSize = 640*480;
-		
-		
-//		try {
-//			imgtmp = ImageIO.read(getClass().getResource("base_CG_1/fundo.jpg"));
-//			System.out.println(""+imgtmp.toString());
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
 		
 		imgtmp = loadImage("base_CG_1/fundo.jpg");
 		
@@ -107,85 +104,6 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		System.out.println("Buffer SIZE "+bufferDeVideo.length );
 		
-		
-//		File f = new File("base_CG_1/t1.bmp");
-//		try {
-//			DataInputStream din = new DataInputStream(new FileInputStream(f));
-//			byte b[] = new byte[128];
-//			int quant = 0;
-//			int cont = 0;
-//			while((quant = din.read(b))>=0) {
-//				for(int i = 0; i < quant;i++) {
-//					System.out.print(""+(b[i]&0xff)+" ");
-//				}
-//				System.out.println();
-//				cont++;
-//				if(cont==10) {
-//					break;
-//				}
-//			}
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-		
-//		for(int i = 0; i < H;i++) {
-//			for(int j = 0; j < W;j++) {
-//				int pos = (i*W*4)+(j*4);
-//				
-//				int soma = bufferDeVideo[pos+1]&0xff;
-//				soma += bufferDeVideo[pos+2]&0xff;
-//				soma += bufferDeVideo[pos+3]&0xff;
-//				
-//				int media = soma/3;
-//				//System.out.println(""+media);
-//				
-//				bufferDeVideo[pos+1] = (byte)(Math.min((media*20)/100,255)&0x00ff);
-//				bufferDeVideo[pos+2] = (byte)(Math.min((media*60)/100,255)&0x00ff);
-//				bufferDeVideo[pos+3] = (byte)(Math.min((media*20)/100,255)&0x00ff);
-//			}
-//		}
-		
-		//memoriaPlacaVideo = new byte[W*H];
-		
-		
-		/*paleta = new short[255][3];
-		
-		for(int i = 0; i < 255;i++){
-			paleta[i][0] = (short)rand.nextInt(255);
-			paleta[i][1] = (short)rand.nextInt(255);
-			paleta[i][2] = (short)rand.nextInt(255);
-			
-		}*/
-		
-		//Seta Bugfeer com noise
-		/*for(int i = 0; i < bufferDeVideo.length;i+=4){
-			int r = rand.nextInt(255);
-			int g = rand.nextInt(255);
-			int b = rand.nextInt(255);
-			
-			bufferDeVideo[i] = (byte)0x00ff;
-			bufferDeVideo[i+1] = (byte)(0x00ff&b);
-			bufferDeVideo[i+2] = (byte)(0x00ff&g);
-			bufferDeVideo[i+3] = (byte)(0x00ff&r);
-		}8?
-		
-//		// 100,20 200,20
-//		for(int i = 0; i < 100;i++){
-//			int x = 100+i;
-//			int y = 20;
-//			int bt = x*4+y*640*4;
-//			bufferDeVideo[bt] = (byte)0x00ff;
-//			bufferDeVideo[bt+1] = (byte)0;
-//			bufferDeVideo[bt+2] = (byte)0;
-//			bufferDeVideo[bt+3] = (byte)0x00ff;
-//		}
-		
-		/*for(int y = 0; y < H;y++){
-			for(int x = 0; x < W;x++){
-				memoriaPlacaVideo[x+y*W] = (byte)((y%255)&0x00ff);
-			}
-		}*/
 		addKeyListener(new KeyListener() {
 			
 			@Override
@@ -400,36 +318,15 @@ public class MainCanvas extends JPanel implements Runnable{
 			
 			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
 			if(slope_error >= 0) {
-				pospix += (W*4)*dirY; // Avançando o pixel verticalmente
+				pospix += (W*4) * dirY; // Avançando o pixel verticalmente
 				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
 		}
 	}
 
-	public void aplicarTransformacoes() {
-		int pospix;
-		ArrayList<Ponto2D> posList = new ArrayList<>();
-		
-		if(trans2D == null)
-			trans2D = new Transformacao2D(0, 0);
+	public void desenhaLinha(Linha2D linha) {
+		Ponto2D[] pLinha = linha.getPontos();
 
-		trans2D.translate(-W, -H);
-		trans2D.rotation(90);
-		trans2D.translate(W, H);
-
-		for(int y = 0; y <= H; y++) {
-			for(int x = 0; x <= W; x++) {
-				pospix = y*(W*4)+x*4;
-				if (bufferDeVideo[pospix] != (byte)0)
-					posList.add(new Ponto2D(x, y));
-			}
-		}
-
-		for (Ponto2D ponto : posList) {
-			pospix = ponto.posCalculation(W, 4);
-			trans2D.changePoint(ponto.getpX(), ponto.getpY());
-
-		}
 
 	}
 
