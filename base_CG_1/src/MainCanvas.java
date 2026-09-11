@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+import javax.swing.plaf.basic.BasicListUI.ListSelectionHandler;
+
+import java.util.Arrays;
+import java.util.ArrayList;
 
 public class MainCanvas extends JPanel implements Runnable{
 	int W = 640;
@@ -58,8 +62,13 @@ public class MainCanvas extends JPanel implements Runnable{
 	float filtroG = 1;
 	float filtroB = 1;
 	
-	float q1x = 10,q1y = 100;
-	float q2x = 10,q2y = 200;
+	Ponto2D p0 = null;
+	Ponto2D p1 = null;
+
+	Linha2D l0 = null;
+	Linha2D l1 = null;
+	Linha2D l2 = null;
+	Linha2D l3 = null;
 	
 	public MainCanvas() {
 		
@@ -77,7 +86,6 @@ public class MainCanvas extends JPanel implements Runnable{
 		}
 		
 		
-		
 		setSize(640,480);
 		setFocusable(true);
 		
@@ -85,14 +93,6 @@ public class MainCanvas extends JPanel implements Runnable{
 		Altura = 480;
 		
 		pixelSize = 640*480;
-		
-		
-//		try {
-//			imgtmp = ImageIO.read(getClass().getResource("base_CG_1/fundo.jpg"));
-//			System.out.println(""+imgtmp.toString());
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
 		
 		imgtmp = loadImage("base_CG_1/fundo.jpg");
 		
@@ -104,85 +104,6 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		System.out.println("Buffer SIZE "+bufferDeVideo.length );
 		
-		
-//		File f = new File("base_CG_1/t1.bmp");
-//		try {
-//			DataInputStream din = new DataInputStream(new FileInputStream(f));
-//			byte b[] = new byte[128];
-//			int quant = 0;
-//			int cont = 0;
-//			while((quant = din.read(b))>=0) {
-//				for(int i = 0; i < quant;i++) {
-//					System.out.print(""+(b[i]&0xff)+" ");
-//				}
-//				System.out.println();
-//				cont++;
-//				if(cont==10) {
-//					break;
-//				}
-//			}
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-		
-//		for(int i = 0; i < H;i++) {
-//			for(int j = 0; j < W;j++) {
-//				int pos = (i*W*4)+(j*4);
-//				
-//				int soma = bufferDeVideo[pos+1]&0xff;
-//				soma += bufferDeVideo[pos+2]&0xff;
-//				soma += bufferDeVideo[pos+3]&0xff;
-//				
-//				int media = soma/3;
-//				//System.out.println(""+media);
-//				
-//				bufferDeVideo[pos+1] = (byte)(Math.min((media*20)/100,255)&0x00ff);
-//				bufferDeVideo[pos+2] = (byte)(Math.min((media*60)/100,255)&0x00ff);
-//				bufferDeVideo[pos+3] = (byte)(Math.min((media*20)/100,255)&0x00ff);
-//			}
-//		}
-		
-		//memoriaPlacaVideo = new byte[W*H];
-		
-		
-		/*paleta = new short[255][3];
-		
-		for(int i = 0; i < 255;i++){
-			paleta[i][0] = (short)rand.nextInt(255);
-			paleta[i][1] = (short)rand.nextInt(255);
-			paleta[i][2] = (short)rand.nextInt(255);
-			
-		}*/
-		
-		//Seta Bugfeer com noise
-		/*for(int i = 0; i < bufferDeVideo.length;i+=4){
-			int r = rand.nextInt(255);
-			int g = rand.nextInt(255);
-			int b = rand.nextInt(255);
-			
-			bufferDeVideo[i] = (byte)0x00ff;
-			bufferDeVideo[i+1] = (byte)(0x00ff&b);
-			bufferDeVideo[i+2] = (byte)(0x00ff&g);
-			bufferDeVideo[i+3] = (byte)(0x00ff&r);
-		}8?
-		
-//		// 100,20 200,20
-//		for(int i = 0; i < 100;i++){
-//			int x = 100+i;
-//			int y = 20;
-//			int bt = x*4+y*640*4;
-//			bufferDeVideo[bt] = (byte)0x00ff;
-//			bufferDeVideo[bt+1] = (byte)0;
-//			bufferDeVideo[bt+2] = (byte)0;
-//			bufferDeVideo[bt+3] = (byte)0x00ff;
-//		}
-		
-		/*for(int y = 0; y < H;y++){
-			for(int x = 0; x < W;x++){
-				memoriaPlacaVideo[x+y*W] = (byte)((y%255)&0x00ff);
-			}
-		}*/
 		addKeyListener(new KeyListener() {
 			
 			@Override
@@ -330,11 +251,22 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		//drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
 		
+		p0 = new Ponto2D(50, 50);
+		p1 = new Ponto2D(250, 150);
+
 		// Desenhando linhas usando o algoritmo de Bresenham
-		bresenhamAlgorithm(50, 50, 250, 150);
-		bresenhamAlgorithm(50, 100, 100, 300);
-		bresenhamAlgorithm(75, 200, 250, 100);
-		bresenhamAlgorithm(300, 50, 600, 400);
+		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+		
+		p0.setpX(250); p0.setpY(350); p1.setpX(100); p1.setpY(50);
+		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+
+		// y1 > y2
+		p0.setpX(75); p0.setpY(200); p1.setpX(250); p1.setpY(100);
+		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+
+		// x1 > x2
+		p0.setpX(600); p0.setpY(50); p1.setpX(300); p1.setpY(400);
+		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
 		
 		/*for(int i = 0; i < memoriaPlacaVideo.length;i++){
 			int bufferindex = i*4;
@@ -356,32 +288,46 @@ public class MainCanvas extends JPanel implements Runnable{
 	
 	// Procedimento de Bresenham para desenhar uma linha entre os pontos (x1, y1) e (x2, y2)
 	public void bresenhamAlgorithm(int x1, int y1, int x2, int y2) {
+		int dirX = 1;
+		int dirY = 1;
+
+		// Se o x1 > x2, a linha vai avançar para a esquerda
+		if(x1 > x2) {
+			dirX = -1; 
+		}
+
+		// Se o y1 > y2, a linha vai subir
+		if(y1 > y2) {
+			dirY = -1;
+		}
+
 		int pospix = y1*(W*4)+x1*4;
 		int m = 2 * (y2-y1);
 		int slope_error = m - (x2-x1);
 
-		for(int x = x1; x <= x2; x++) {
+		for(int x = x1; x != x2; x+=dirX) {
 			// Desenhando o pixel
 			bufferDeVideo[pospix] = (byte)255;
 			bufferDeVideo[pospix+1] = (byte)255;
 			bufferDeVideo[pospix+2] = (byte)0;
 			bufferDeVideo[pospix+3] = (byte)0;
 			
-			pospix += 4;  // Avançando o pixel horizontalmente
+			pospix += 4 * dirX;  // Avançando o pixel horizontalmente
 
 			slope_error += m;  // Atualizando o erro da inclinação
 			
 			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
 			if(slope_error >= 0) {
-				pospix += W*4; // Avançando o pixel verticalmente
+				pospix += (W*4) * dirY; // Avançando o pixel verticalmente
 				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
 		}
 	}
 
-	public void operacaoTranslacao(int , int dy) {
-		posx += dx;
-		posy += dy;
+	public void desenhaLinha(Linha2D linha) {
+		Ponto2D[] pLinha = linha.getPontos();
+
+
 	}
 
 	public void desenhaLinhaHorizontal(int x, int y,int w) {
@@ -451,18 +397,6 @@ public class MainCanvas extends JPanel implements Runnable{
 		if(RIGHT) {
 			posx += vel*difS;
 		}
-		
-		/*
-		q1x+=0.2;
-		//q2x=q2x+100*diftime/1000.0f;
-		float dx = mouseX-q2x;
-		float dy = mouseY-q2y;
-		
-		double ang = Math.atan2(dy, dx);
-		
-		q2x = (float)(q2x+Math.cos(ang)*100*diftime/1000.0f);
-		q2y = (float)(q2y+Math.sin(ang)*100*diftime/1000.0f);
-		*/
 	}
 	
 	

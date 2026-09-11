@@ -16,7 +16,7 @@ public class Ponto2D {
     public int getpY() {
         return pY;
     }
-    
+
     // Setters
     public void setpX(int pX) {
         this.pX = pX;
@@ -26,5 +26,13 @@ public class Ponto2D {
         this.pY = pY;
     }
 
-    
+    // Cálculo da posição do pixel
+    public int posCalculation(int width, int channel) {
+        return this.pY * (width * channel) + this.pX * channel;
+    }
+
+    // Validação da coordenada
+    public boolean isValidCoordenates(int width, int height) {
+        return (this.pX >= 0 && this.pY >= 0) && (this.pX <= width && this.pY <= height);
+    }
 }
