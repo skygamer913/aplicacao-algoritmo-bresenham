@@ -62,13 +62,13 @@ public class MainCanvas extends JPanel implements Runnable{
 	float filtroG = 1;
 	float filtroB = 1;
 	
+	Matrix2D transform2D = new Matrix2D(0, 0);
+	
+	Ponto2D pC = new Ponto2D(0, 0);
 	Ponto2D p0 = null;
 	Ponto2D p1 = null;
-
-	Linha2D l0 = null;
-	Linha2D l1 = null;
-	Linha2D l2 = null;
-	Linha2D l3 = null;
+	
+	ArrayList<Linha2D> linhas = new ArrayList<>();
 	
 	public MainCanvas() {
 		
@@ -135,15 +135,39 @@ public class MainCanvas extends JPanel implements Runnable{
 				//System.out.println("CLICO "+key);
 				if(key == KeyEvent.VK_W) {
 					UP = true;
+					transform2D.translate(0, -10);
 				}
 				if(key == KeyEvent.VK_S) {
 					DOWN = true;
+					transform2D.translate(0, 10);
 				}
 				if(key == KeyEvent.VK_A) {
 					LEFT = true;
+					transform2D.translate(-10, 0);
 				}
 				if(key == KeyEvent.VK_D) {
 					RIGHT = true;
+					transform2D.translate(10, 0);
+				}
+				if(key == KeyEvent.VK_Q) {
+					transform2D.translate(-pC.getpX(), -pC.getpY());
+					transform2D.rotation(-15);
+					transform2D.translate(pC.getpX(), pC.getpY());
+				}
+				if(key == KeyEvent.VK_E) {
+					transform2D.translate(-pC.getpX(), -pC.getpY());
+					transform2D.rotation(15);
+					transform2D.translate(pC.getpX(), pC.getpY());
+				}
+				if(key == KeyEvent.VK_M) {
+					transform2D.translate(-pC.getpX(), -pC.getpY());
+					transform2D.scale(10, 10);
+					transform2D.translate(pC.getpX(), pC.getpY());
+				}
+				if(key == KeyEvent.VK_N) {
+					transform2D.translate(-pC.getpX(), -pC.getpY());
+					transform2D.scale(-10, -10);
+					transform2D.translate(pC.getpX(), pC.getpY());
 				}
 			}
 		});		
@@ -161,7 +185,18 @@ public class MainCanvas extends JPanel implements Runnable{
 				clickX = e.getX();
 				clickY = e.getY();
 				
-				System.out.println("CLICO ");
+				if(e.getButton() == 1) {
+					// Função para criar novas linhas
+					if(p0 == null) {
+						p0 = new Ponto2D(clickX, clickY);
+					} else {
+						p1 = new Ponto2D(clickX, clickY);
+						linhas.add(new Linha2D(p0, p1));
+						p0 = null;
+					}
+				} else if (e.getButton() == 3) {
+					pC = new Ponto2D(clickX, clickY);
+				}
 			}
 			
 			@Override
@@ -253,28 +288,28 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		p0 = new Ponto2D(50, 50);
 		p1 = new Ponto2D(250, 150);
-
-		// Desenhando linhas usando o algoritmo de Bresenham
-		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+		Linha2D l = new Linha2D(p0, p1);
 		
-		p0.setpX(250); p0.setpY(350); p1.setpX(100); p1.setpY(50);
-		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+		linhas.add(l);  // Adicionando a linha na lista de linhas
+		
+		// x1 > x2 & y1 > y2
+		p0.setpX(250); p0.setpY(350); p1.setpX(100); p1.setpY(50);  // Alterando as posições dos pontos
+		l.setPontos(p0, p1); linhas.add(l);  // Gerando uma nova linha
 
 		// y1 > y2
 		p0.setpX(75); p0.setpY(200); p1.setpX(250); p1.setpY(100);
-		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+		l.setPontos(p0, p1); linhas.add(l);
 
 		// x1 > x2
 		p0.setpX(600); p0.setpY(50); p1.setpX(300); p1.setpY(400);
-		bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+		l.setPontos(p0, p1); linhas.add(l);
 		
-		/*for(int i = 0; i < memoriaPlacaVideo.length;i++){
-			int bufferindex = i*4;
-			bufferDeVideo[bufferindex] = (byte)0x00ff;
-			bufferDeVideo[bufferindex+1] = (byte)(paleta[memoriaPlacaVideo[i]&0x00ff][2]&0x00ff);
-			bufferDeVideo[bufferindex+2] = (byte)(paleta[memoriaPlacaVideo[i]&0x00ff][1]&0x00ff);
-			bufferDeVideo[bufferindex+3] = (byte)(paleta[memoriaPlacaVideo[i]&0x00ff][0]&0x00ff);
-		}*/
+		for(Linha2D line : linhas) {
+			p0 = line.getPontos()[0];
+			p1 = line.getPontos()[1];
+			
+			bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+		}
 		
 		g.setFont(f);
 		

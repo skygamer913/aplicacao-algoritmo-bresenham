@@ -66,11 +66,11 @@ public class Matrix2D {
     } 
 
     // Método para aplicar a translação
-    public void translate(float a, float b) {
+    public void translate(float ax, float by) {
         // Gerando a matriz translate
         float[] matTranslate = {
-            1, 0, a,
-            0, 1, b,
+            1, 0, ax,
+            0, 1, by,
             0, 0, 1,
         };
         
@@ -111,11 +111,11 @@ public class Matrix2D {
     }
 
     // Método de operção de escala
-    public void scale(float a, float b) {
+    public void scale(float ax, float by) {
         // Gerando a matriz de escala
         float[] matScale = {
-            a, 0, 0,
-            0, b, 0,
+            ax, 0, 0,
+            0, by, 0,
             0, 0, 1
         };
         
@@ -131,11 +131,11 @@ public class Matrix2D {
     }
 
     // Método de shear
-    public void shear(float a, float b) {
+    public void shear(float ax, float by) {
         // Gerando a matriz de shear
         float[] matShear = {
-            1, a, 0,
-            b, 1, 0,
+            1, ax, 0,
+            by, 1, 0,
             0, 0, 1
         };
 

@@ -25,7 +25,17 @@ public class Ponto2D {
     public void setpY(int pY) {
         this.pY = pY;
     }
-
+    
+    // Função de transformação 2D por matriz
+    public void transform2D(Matrix2D mat) {
+    	mat.changePoint(this.pX, this.pY);  // Altera as coordenadas do ponto na matriz
+    	
+    	int[] matT = mat.applyTransformation();  // Gera uma matriz do resultado da transformação
+    	
+    	this.pX = matT[0];
+    	this.pY = matT[1];
+    }
+    
     // Cálculo da posição do pixel
     public int posCalculation(int width, int channel) {
         return this.pY * (width * channel) + this.pX * channel;
