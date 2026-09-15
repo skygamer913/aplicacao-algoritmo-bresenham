@@ -23,6 +23,10 @@ public class Matrix2D {
         this.matPonto[2] = 1;
     }
 
+    public boolean isTransformed() {
+    	return this.isTransformed;
+    }
+    
     // Método para multiplicar duas matrizes 3x3
     private void updateMatrix(float[] matA, float[] matB) {
         float[] result = new float[9];
@@ -42,6 +46,7 @@ public class Matrix2D {
         for(int i = 0; i < 9; i++) {
             this.matFinal[i] = 0;
         }
+        this.isTransformed = false;
     }
 
     public void changePoint(int new_x, int new_y) {

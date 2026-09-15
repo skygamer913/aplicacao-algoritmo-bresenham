@@ -85,6 +85,10 @@ public class MainCanvas extends JPanel implements Runnable{
 			e1.printStackTrace();
 		}
 		
+		linhas.add(new Linha2D(50, 50, 250, 150));
+		linhas.add(new Linha2D(250, 350, 100, 50));
+		linhas.add(new Linha2D(75, 200, 250, 100));
+		linhas.add(new Linha2D(600, 50, 300, 400));
 		
 		setSize(640,480);
 		setFocusable(true);
@@ -284,31 +288,24 @@ public class MainCanvas extends JPanel implements Runnable{
 			bufferDeVideo[i] = 0;
 		}
 		
+		if(p0)
+		
 		//drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
-		
-		p0 = new Ponto2D(50, 50);
-		p1 = new Ponto2D(250, 150);
-		Linha2D l = new Linha2D(p0, p1);
-		
-		linhas.add(l);  // Adicionando a linha na lista de linhas
-		
-		// x1 > x2 & y1 > y2
-		p0.setpX(250); p0.setpY(350); p1.setpX(100); p1.setpY(50);  // Alterando as posições dos pontos
-		l.setPontos(p0, p1); linhas.add(l);  // Gerando uma nova linha
-
-		// y1 > y2
-		p0.setpX(75); p0.setpY(200); p1.setpX(250); p1.setpY(100);
-		l.setPontos(p0, p1); linhas.add(l);
-
-		// x1 > x2
-		p0.setpX(600); p0.setpY(50); p1.setpX(300); p1.setpY(400);
-		l.setPontos(p0, p1); linhas.add(l);
-		
 		for(Linha2D line : linhas) {
-			p0 = line.getPontos()[0];
-			p1 = line.getPontos()[1];
+			if(transform2D.isTransformed()) {
+				line.transform2D(transform2D);
+			}
+			p0 = line.getp0();
+			p1 = line.getp1();
 			
 			bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+		}
+		p0 
+		transform2D.resetMatrix();
+		
+		
+		if(pC != null) {
+			desenhaPixel(pC.getpX(), pC.getpY(), 255, 0, 0);
 		}
 		
 		g.setFont(f);
@@ -326,13 +323,10 @@ public class MainCanvas extends JPanel implements Runnable{
 		int dirX = 1;
 		int dirY = 1;
 
-		// Se o x1 > x2, a linha vai avançar para a esquerda
-		if(x1 > x2) {
+		if(x1 > x2) {  // Se o x1 > x2, a linha vai avançar para a esquerda
 			dirX = -1; 
 		}
-
-		// Se o y1 > y2, a linha vai subir
-		if(y1 > y2) {
+		if(y1 > y2) {  // Se o y1 > y2, a linha vai subir
 			dirY = -1;
 		}
 
@@ -357,12 +351,6 @@ public class MainCanvas extends JPanel implements Runnable{
 				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
 		}
-	}
-
-	public void desenhaLinha(Linha2D linha) {
-		Ponto2D[] pLinha = linha.getPontos();
-
-
 	}
 
 	public void desenhaLinhaHorizontal(int x, int y,int w) {
