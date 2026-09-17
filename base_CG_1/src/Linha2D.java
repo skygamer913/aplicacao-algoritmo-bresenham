@@ -34,4 +34,12 @@ public class Linha2D {
         	p.transform2D(matTransform);
         }
     }
+
+    public boolean isCompletelyInside(int width, int height) {
+        return pontos[0].isValidCoordenates(width, height) && pontos[1].isValidCoordenates(width, height);
+    }
+
+    public boolean isPartiallyInside(int width, int height) {
+        return pontos[0].isValidCoordenates(width, height) || pontos[1].isValidCoordenates(width, height);
+    }
 }

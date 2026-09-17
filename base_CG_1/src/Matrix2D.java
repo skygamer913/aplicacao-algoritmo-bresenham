@@ -1,4 +1,3 @@
-import java.lang.Math;
 
 public class Matrix2D {
     // atributos

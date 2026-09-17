@@ -10,13 +10,10 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-import javax.swing.plaf.basic.BasicListUI.ListSelectionHandler;
-
-import java.util.Arrays;
-import java.util.ArrayList;
 
 public class MainCanvas extends JPanel implements Runnable{
 	int W = 640;
@@ -62,9 +59,17 @@ public class MainCanvas extends JPanel implements Runnable{
 	float filtroG = 1;
 	float filtroB = 1;
 	
+	Linha2D[] wBorders = {
+		new Linha2D(0, 0, 640, 0),
+		new Linha2D(0, 0, 0, 480),
+		new Linha2D(640, 0, 640, 480),
+		new Linha2D(0, 480, 640, 480)
+	};
+
 	Matrix2D transform2D = new Matrix2D(0, 0);
 	
-	Ponto2D pC = new Ponto2D(0, 0);
+	Ponto2D pC = new Ponto2D(320, 240);
+	Ponto2D np = null;
 	Ponto2D p0 = null;
 	Ponto2D p1 = null;
 	
@@ -84,11 +89,11 @@ public class MainCanvas extends JPanel implements Runnable{
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		linhas.add(new Linha2D(50, 50, 250, 150));
-		linhas.add(new Linha2D(250, 350, 100, 50));
-		linhas.add(new Linha2D(75, 200, 250, 100));
-		linhas.add(new Linha2D(600, 50, 300, 400));
+
+		linhas.add(new Linha2D(200, 150, 350, 250));
+		// linhas.add(new Linha2D(250, 350, 100, 50));
+		// linhas.add(new Linha2D(75, 200, 250, 100));
+		// linhas.add(new Linha2D(600, 50, 300, 400));
 		
 		setSize(640,480);
 		setFocusable(true);
@@ -98,7 +103,7 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		pixelSize = 640*480;
 		
-		imgtmp = loadImage("base_CG_1/fundo.jpg");
+		imgtmp = loadImage("base_CG_1/imgbmp.bmp");
 		
 		imageBuffer = new BufferedImage(640,480, BufferedImage.TYPE_4BYTE_ABGR);
 		//imageBuffer.getGraphics().drawImage(imgtmp, 0, 0, null);
@@ -155,22 +160,22 @@ public class MainCanvas extends JPanel implements Runnable{
 				}
 				if(key == KeyEvent.VK_Q) {
 					transform2D.translate(-pC.getpX(), -pC.getpY());
-					transform2D.rotation(-15);
+					transform2D.rotation(-5);
 					transform2D.translate(pC.getpX(), pC.getpY());
 				}
 				if(key == KeyEvent.VK_E) {
 					transform2D.translate(-pC.getpX(), -pC.getpY());
-					transform2D.rotation(15);
+					transform2D.rotation(5);
 					transform2D.translate(pC.getpX(), pC.getpY());
 				}
 				if(key == KeyEvent.VK_M) {
 					transform2D.translate(-pC.getpX(), -pC.getpY());
-					transform2D.scale(10, 10);
+					transform2D.scale(2, 2);
 					transform2D.translate(pC.getpX(), pC.getpY());
 				}
 				if(key == KeyEvent.VK_N) {
 					transform2D.translate(-pC.getpX(), -pC.getpY());
-					transform2D.scale(-10, -10);
+					transform2D.scale(-2, -2);
 					transform2D.translate(pC.getpX(), pC.getpY());
 				}
 			}
@@ -191,12 +196,12 @@ public class MainCanvas extends JPanel implements Runnable{
 				
 				if(e.getButton() == 1) {
 					// Função para criar novas linhas
-					if(p0 == null) {
-						p0 = new Ponto2D(clickX, clickY);
+					if(np == null) {
+						np = new Ponto2D(clickX, clickY);
 					} else {
 						p1 = new Ponto2D(clickX, clickY);
-						linhas.add(new Linha2D(p0, p1));
-						p0 = null;
+						linhas.add(new Linha2D(np, p1));
+						np = null;
 					}
 				} else if (e.getButton() == 3) {
 					pC = new Ponto2D(clickX, clickY);
@@ -288,21 +293,19 @@ public class MainCanvas extends JPanel implements Runnable{
 			bufferDeVideo[i] = 0;
 		}
 		
-		if(p0)
-		
 		//drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
-		for(Linha2D line : linhas) {
+		for(Linha2D linha : linhas) {
 			if(transform2D.isTransformed()) {
-				line.transform2D(transform2D);
+				linha.transform2D(transform2D);
 			}
-			p0 = line.getp0();
-			p1 = line.getp1();
 			
+			p0 = linha.getp0();
+			p1 = linha.getp1();
+
 			bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
 		}
-		p0 
-		transform2D.resetMatrix();
 		
+		transform2D.resetMatrix();
 		
 		if(pC != null) {
 			desenhaPixel(pC.getpX(), pC.getpY(), 255, 0, 0);
@@ -352,7 +355,25 @@ public class MainCanvas extends JPanel implements Runnable{
 			}
 		}
 	}
+	/*
+	public void desenhaLinha(Linha2D linha) {
+		p0 = linha.getp0();
+		p1 = linha.getp1();
+		
+		if(linha.isCompletelyInside(W, H)) {
+			bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+		} else if(linha.isPartiallyInside(W, H)) {
+			Linha2D lB = null;
+			for(Linha2D border : wBorders) {
+				if (linha.itIntersects(border)) {
+					lB = border;
+					break;
+				}
+			}
 
+		}
+	}
+	*/
 	public void desenhaLinhaHorizontal(int x, int y,int w) {
 		int pospix = y*(W*4)+x*4;
 		
