@@ -1,11 +1,15 @@
+package Code2D;
+
 public class Ponto2D {
     private int pX;
     private int pY;
+    private int w;
 
     // Construtor
     public Ponto2D(int x, int y) {
         this.pX = x;
         this.pY = y;
+        this.w = 1;
     }
 
     // Getters
@@ -18,22 +22,17 @@ public class Ponto2D {
     }
 
     // Setters
-    public void setpX(int pX) {
-        this.pX = pX;
-    }
-
-    public void setpY(int pY) {
-        this.pY = pY;
+    public void updatePoint(int pX, int pY) {
+    	this.pX = pX;
+    	this.pY = pY;
     }
     
     // Função de transformação 2D por matriz
     public void transform2D(Matrix2D mat) {
-    	mat.changePoint(this.pX, this.pY);  // Altera as coordenadas do ponto na matriz
+    	float[] matT = mat.applyTransform(pX, pY, 1);  // Gera uma matriz do resultado da transformação
     	
-    	int[] matT = mat.applyTransformation();  // Gera uma matriz do resultado da transformação
-    	
-    	this.pX = matT[0];
-    	this.pY = matT[1];
+    	this.pX = Math.round(matT[0]);
+    	this.pY = Math.round(matT[1]);
     }
     
     // Cálculo da posição do pixel

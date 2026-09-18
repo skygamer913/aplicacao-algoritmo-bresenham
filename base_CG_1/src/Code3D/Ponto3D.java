@@ -1,3 +1,4 @@
+package Code3D;
 public class Ponto3D {
     private int pX;
     private int pY;

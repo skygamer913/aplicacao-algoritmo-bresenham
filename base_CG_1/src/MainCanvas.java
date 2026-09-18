@@ -15,6 +15,10 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import Code2D.Linha2D;
+import Code2D.Matrix2D;
+import Code2D.Ponto2D;
+
 public class MainCanvas extends JPanel implements Runnable{
 	int W = 640;
 	int H = 480;
@@ -65,11 +69,13 @@ public class MainCanvas extends JPanel implements Runnable{
 		new Linha2D(640, 0, 640, 480),
 		new Linha2D(0, 480, 640, 480)
 	};
+	
+	Linha2D linhaPreview = null;
 
-	Matrix2D transform2D = new Matrix2D(0, 0);
+	Matrix2D transform2D = new Matrix2D();
 	
 	Ponto2D pC = new Ponto2D(320, 240);
-	Ponto2D np = null;
+	Ponto2D pM = new Ponto2D(mouseX, mouseY);
 	Ponto2D p0 = null;
 	Ponto2D p1 = null;
 	
@@ -77,7 +83,7 @@ public class MainCanvas extends JPanel implements Runnable{
 	
 	public MainCanvas() {
 		
-		File f = new File("base_CG_1/imgbmp.bmp");
+		File f = new File("CG_1/imgbmp.bmp");
 		try (java.io.FileInputStream fin = new java.io.FileInputStream(f)) {
 
 			byte todosodbytes[] = new byte[64000];
@@ -103,7 +109,7 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		pixelSize = 640*480;
 		
-		imgtmp = loadImage("base_CG_1/imgbmp.bmp");
+		imgtmp = loadImage("CG_1/imgbmp.bmp");
 		
 		imageBuffer = new BufferedImage(640,480, BufferedImage.TYPE_4BYTE_ABGR);
 		//imageBuffer.getGraphics().drawImage(imgtmp, 0, 0, null);
@@ -144,39 +150,55 @@ public class MainCanvas extends JPanel implements Runnable{
 				//System.out.println("CLICO "+key);
 				if(key == KeyEvent.VK_W) {
 					UP = true;
-					transform2D.translate(0, -10);
+					for(Linha2D l : linhas) {
+						l.translate(0, -10);
+					}
 				}
 				if(key == KeyEvent.VK_S) {
 					DOWN = true;
-					transform2D.translate(0, 10);
+					for(Linha2D l : linhas) {
+						l.translate(0, 10);
+					}
 				}
 				if(key == KeyEvent.VK_A) {
 					LEFT = true;
-					transform2D.translate(-10, 0);
+					for(Linha2D l : linhas) {
+						l.translate(-10, 0);
+					}
 				}
 				if(key == KeyEvent.VK_D) {
 					RIGHT = true;
-					transform2D.translate(10, 0);
+					for(Linha2D l : linhas) {
+						l.translate(10, 0);
+					}
 				}
 				if(key == KeyEvent.VK_Q) {
-					transform2D.translate(-pC.getpX(), -pC.getpY());
-					transform2D.rotation(-5);
-					transform2D.translate(pC.getpX(), pC.getpY());
+					for(Linha2D l : linhas) {
+						l.translate(-pC.getpX(), -pC.getpY());
+						l.rotate(-15);
+						l.translate(pC.getpX(), pC.getpY());
+					}
 				}
 				if(key == KeyEvent.VK_E) {
-					transform2D.translate(-pC.getpX(), -pC.getpY());
-					transform2D.rotation(5);
-					transform2D.translate(pC.getpX(), pC.getpY());
+					for(Linha2D l : linhas) {
+						l.translate(-pC.getpX(), -pC.getpY());
+						l.rotate(15);
+						l.translate(pC.getpX(), pC.getpY());
+					}
 				}
 				if(key == KeyEvent.VK_M) {
-					transform2D.translate(-pC.getpX(), -pC.getpY());
-					transform2D.scale(2, 2);
-					transform2D.translate(pC.getpX(), pC.getpY());
+					for(Linha2D l : linhas) {
+						l.translate(-pC.getpX(), -pC.getpY());
+						l.scale(1.5f, 1.5f);
+						l.translate(pC.getpX(), pC.getpY());
+					}
 				}
 				if(key == KeyEvent.VK_N) {
-					transform2D.translate(-pC.getpX(), -pC.getpY());
-					transform2D.scale(-2, -2);
-					transform2D.translate(pC.getpX(), pC.getpY());
+					for(Linha2D l : linhas) {
+						l.translate(-pC.getpX(), -pC.getpY());
+						l.scale(0.5f, 0.5f);
+						l.translate(pC.getpX(), pC.getpY());
+					}
 				}
 			}
 		});		
@@ -196,14 +218,15 @@ public class MainCanvas extends JPanel implements Runnable{
 				
 				if(e.getButton() == 1) {
 					// Função para criar novas linhas
-					if(np == null) {
-						np = new Ponto2D(clickX, clickY);
+					if(p0 == null) {
+						p0 = new Ponto2D(clickX, clickY);
 					} else {
 						p1 = new Ponto2D(clickX, clickY);
-						linhas.add(new Linha2D(np, p1));
-						np = null;
+						linhas.add(new Linha2D(p0, p1));
+						p0 = null;
 					}
-				} else if (e.getButton() == 3) {
+				}
+				if (e.getButton() == 3) {
 					pC = new Ponto2D(clickX, clickY);
 				}
 			}
@@ -295,17 +318,14 @@ public class MainCanvas extends JPanel implements Runnable{
 		
 		//drawImageToBuffer(imgtmp,(int)posx,(int)posy,filtroR,filtroG,filtroB);
 		for(Linha2D linha : linhas) {
-			if(transform2D.isTransformed()) {
-				linha.transform2D(transform2D);
-			}
-			
-			p0 = linha.getp0();
-			p1 = linha.getp1();
-
-			bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
+			desenhaLinha(linha, 255, 0, 0);
 		}
 		
-		transform2D.resetMatrix();
+		if(p0 != null) {
+			pM.updatePoint(mouseX, mouseY);
+			linhaPreview = new Linha2D(p0, pM);
+			desenhaLinha(linhaPreview, 0, 0, 255);
+		}
 		
 		if(pC != null) {
 			desenhaPixel(pC.getpX(), pC.getpY(), 255, 0, 0);
@@ -322,15 +342,11 @@ public class MainCanvas extends JPanel implements Runnable{
 	}
 	
 	// Procedimento de Bresenham para desenhar uma linha entre os pontos (x1, y1) e (x2, y2)
-	public void bresenhamAlgorithm(int x1, int y1, int x2, int y2) {
+	private void bresenhamAlgorithmPos(int x1, int y1, int x2, int y2) {
 		int dirX = 1;
-		int dirY = 1;
 
 		if(x1 > x2) {  // Se o x1 > x2, a linha vai avançar para a esquerda
 			dirX = -1; 
-		}
-		if(y1 > y2) {  // Se o y1 > y2, a linha vai subir
-			dirY = -1;
 		}
 
 		int pospix = y1*(W*4)+x1*4;
@@ -350,30 +366,56 @@ public class MainCanvas extends JPanel implements Runnable{
 			
 			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
 			if(slope_error >= 0) {
-				pospix += (W*4) * dirY; // Avançando o pixel verticalmente
+				pospix += W * 4; // Avançando o pixel verticalmente
 				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
 			}
 		}
 	}
-	/*
-	public void desenhaLinha(Linha2D linha) {
-		p0 = linha.getp0();
-		p1 = linha.getp1();
-		
-		if(linha.isCompletelyInside(W, H)) {
-			bresenhamAlgorithm(p0.getpX(), p0.getpY(), p1.getpX(), p1.getpY());
-		} else if(linha.isPartiallyInside(W, H)) {
-			Linha2D lB = null;
-			for(Linha2D border : wBorders) {
-				if (linha.itIntersects(border)) {
-					lB = border;
-					break;
-				}
-			}
+	
+	// Procedimento de Bresenham para desenhar uma linha entre os pontos (x1, y1) e (x2, y2)
+	private void bresenhamAlgorithmNeg(int x1, int y1, int x2, int y2, int r, int g, int b) {
+		int dirX = 1;
 
+		if(x1 > x2) {  // Se o x1 > x2, a linha vai avançar para a esquerda
+			dirX = -1; 
+		}
+
+		int pospix = y1*(W*4)+x1*4;
+		int m = 2 * (y2-y1);
+		int slope_error = m - (x2-x1);
+
+		for(int x = x1; x != x2; x+=dirX) {
+			// Desenhando o pixel
+			bufferDeVideo[pospix] = (byte)255;
+			bufferDeVideo[pospix+1] = (byte)(b&0xff);
+			bufferDeVideo[pospix+2] = (byte)(g&0xff);
+			bufferDeVideo[pospix+3] = (byte)(r&0xff);
+			
+			pospix += 4 * dirX;  // Avançando o pixel horizontalmente
+
+			slope_error += m;  // Atualizando o erro da inclinação
+			
+			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
+			if(slope_error <= 0) {
+				pospix -= W * 4; // Avançando o pixel verticalmente
+				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
+			}
 		}
 	}
-	*/
+
+	public void desenhaLinha(Linha2D linha, int r, int g, int b) {
+		Ponto2D pa = linha.getp0();
+		Ponto2D pb = linha.getp1();
+		
+		if(pa.isValidCoordenates(W, H) && pb.isValidCoordenates(W, H)) {
+			if(pa.getpY() <= pb.getpY()) {
+				bresenhamAlgorithmPos(pa.getpX(), pa.getpY(), pb.getpX(), pb.getpY(), r, g, b);
+			} else {
+				bresenhamAlgorithmNeg(pa.getpX(), pa.getpY(), pb.getpX(), pb.getpY(), r, g, b);
+			}
+		}
+	}
+	
 	public void desenhaLinhaHorizontal(int x, int y,int w) {
 		int pospix = y*(W*4)+x*4;
 		

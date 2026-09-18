@@ -1,25 +1,27 @@
+package Code3D;
 
-public class Matrix2D {
+public class Matrix3D {
     // atributos
     private float[] matFinal;
     private float[] matPonto;
     private boolean isTransformed;
 
     // Construtor
-    public Matrix2D(int x, int y) {        
-        this.matPonto = new float[3];
-        this.matFinal = new float[9];
+    public Matrix3D(int x, int y, int z) {        
+        this.matPonto = new float[4];
+        this.matFinal = new float[16];
         this.isTransformed = false;
 
         // Valores inicias da matriz de transformação
-        for(int i = 0; i < 9; i++) {
+        for(int i = 0; i < 16; i++) {
             this.matFinal[i] = 0;
         }
 
         // Valores iniciais das matrizes
         this.matPonto[0] = x;
         this.matPonto[1] = y;
-        this.matPonto[2] = 1;
+        this.matPonto[2] = z;
+        this.matPonto[4] = 1;
     }
 
     public boolean isTransformed() {
@@ -28,12 +30,12 @@ public class Matrix2D {
     
     // Método para multiplicar duas matrizes 3x3
     private void updateMatrix(float[] matA, float[] matB) {
-        float[] result = new float[9];
+        float[] result = new float[16];
 
-        for(int i = 0; i < 3; i++) {
-            for(int j = 0; j < 3; j++) {
-                for(int k = 0; k < 3; k++) {
-                    result[i*3+j] += matA[i*3+k] * matB[k*3+j];
+        for(int i = 0; i < 4; i++) {
+            for(int j = 0; j < 4; j++) {
+                for(int k = 0; k < 4; k++) {
+                    result[i*4+j] += matA[i*4+k] * matB[k*4+j];
                 }
             }
         }
@@ -42,40 +44,43 @@ public class Matrix2D {
     }
 
     public void resetMatrix() {
-        for(int i = 0; i < 9; i++) {
+        for(int i = 0; i < 16; i++) {
             this.matFinal[i] = 0;
         }
         this.isTransformed = false;
     }
 
-    public void changePoint(int new_x, int new_y) {
+    public void changePoint(int new_x, int new_y, int new_z) {
         this.matPonto[0] = new_x;
         this.matPonto[1] = new_y;
+        this.matPonto[2] = new_z;
     }
 
     // Método para aplicar a transformação ao ponto
     public int[] applyTransformation() {
         // Multiplicação da matriz de transformação pelo ponto
-        int[] result = new int[2];
-        float[] matAux = new float[3];
+        int[] result = new int[3];
+        float[] matAux = new float[4];
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 3; j++) {
-                matAux[i] += this.matFinal[i*3+j] * this.matPonto[j];
+                matAux[i] += this.matFinal[i*4+j] * this.matPonto[j];
             }
         }
         result[0] = Math.round(matAux[0]);
         result[1] = Math.round(matAux[1]);
+        result[2] = Math.round(matAux[2]);
 
         return result;  // Retorna o ponto transformado
     } 
 
     // Método para aplicar a translação
-    public void translate(float ax, float by) {
+    public void translate(float tx, float ty, float tz) {
         // Gerando a matriz translate
         float[] matTranslate = {
-            1, 0, ax,
-            0, 1, by,
-            0, 0, 1,
+            1, 0, 0, tx,
+            0, 1, 0, ty,
+            0, 0, 1, tz,
+            0, 0, 0, 1
         };
         
         // Verifica se já ocorreu alguma operação de transformação antes
@@ -96,31 +101,33 @@ public class Matrix2D {
         float sinAng = (float)(Math.sin(ang));
         
         // Matriz de rotação
-        float[] matRotation = {
-            (float) cosAng, (float) sinAng, 0,
-            (float) sinAng * (-1), (float) cosAng, 0,
-            0, 0, 1
+        float[] matRotationZ = {
+            (float) cosAng, (float) sinAng, 0, 0,
+            (float) -sinAng, (float) cosAng, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
         };
 
         // Verifica se já ocorreu alguma operação de transformação antes
         if(!isTransformed) {
-            this.matFinal = matRotation;  // A matriz final recebe a matriz de rotação
+            this.matFinal = matRotationZ;  // A matriz final recebe a matriz de rotação
             this.isTransformed = true;  // Marca que a transformação foi aplicada
 
             return;  // Sai do método após aplicar a primeira transformação
         }
 
         // Multiplicação das matrizes
-        updateMatrix(matFinal, matRotation);
+        updateMatrix(matFinal, matRotationZ);
     }
 
     // Método de operção de escala
-    public void scale(float ax, float by) {
+    public void scale(float ax, float by, float cz) {
         // Gerando a matriz de escala
         float[] matScale = {
-            ax, 0, 0,
-            0, by, 0,
-            0, 0, 1
+            ax, 0, 0, 0,
+            0, by, 0, 0,
+            0, 0, cz, 0,
+            0, 0, 0, 1
         };
         
         // Verifica se já ocorreu alguma operação de transformação antes
@@ -133,26 +140,4 @@ public class Matrix2D {
         // Multiplicação das matrizes
         updateMatrix(matFinal, matScale);
     }
-
-    // Método de shear
-    public void shear(float ax, float by) {
-        // Gerando a matriz de shear
-        float[] matShear = {
-            1, ax, 0,
-            by, 1, 0,
-            0, 0, 1
-        };
-
-        // Verifica se já ocorreu alguma operação de transformação
-        if (!isTransformed) {
-            this.matFinal = matShear;  // A matriz final recebe a matriz de Shear
-            this.isTransformed = true;  // Marca que obteve uma transformação
-
-            return;  // Retorna o método
-        }
-
-        // Multiplicação para a matriz de transformação final
-        updateMatrix(matShear, matFinal);
-    }
-
 }
