@@ -1,11 +1,13 @@
-public class Ponto2D {
+public class Ponto3D {
     private int pX;
     private int pY;
+    private int pZ;
 
     // Construtor
-    public Ponto2D(int x, int y) {
+    public Ponto3D(int x, int y, int z) {
         this.pX = x;
         this.pY = y;
+        this.pZ = z;
     }
 
     // Getters
@@ -15,6 +17,10 @@ public class Ponto2D {
 
     public int getpY() {
         return pY;
+    }
+    
+    public int getpZ() {
+    	return pZ;
     }
 
     // Setters
@@ -26,14 +32,19 @@ public class Ponto2D {
         this.pY = pY;
     }
     
+    public void setpZ(int pZ) {
+    	this.pZ = pZ;
+    }
+    
     // Função de transformação 2D por matriz
-    public void transform2D(Matrix2D mat) {
-    	mat.changePoint(this.pX, this.pY);  // Altera as coordenadas do ponto na matriz
+    public void transform3D(Matrix3D mat) {
+    	mat.changePoint(this.pX, this.pY, this.pZ);  // Altera as coordenadas do ponto na matriz
     	
     	int[] matT = mat.applyTransformation();  // Gera uma matriz do resultado da transformação
     	
     	this.pX = matT[0];
     	this.pY = matT[1];
+    	this.pZ = matT[2];
     }
     
     // Cálculo da posição do pixel
