@@ -341,78 +341,72 @@ public class MainCanvas extends JPanel implements Runnable{
 		g.drawString("FPS "+fps+" mouse: "+mouseX+","+mouseY, 10, 25);
 	}
 	
-	// Procedimento de Bresenham para desenhar uma linha entre os pontos (x1, y1) e (x2, y2)
-	private void bresenhamAlgorithmPos(int x1, int y1, int x2, int y2) {
-		int dirX = 1;
-
-		if(x1 > x2) {  // Se o x1 > x2, a linha vai avançar para a esquerda
-			dirX = -1; 
-		}
-
-		int pospix = y1*(W*4)+x1*4;
-		int m = 2 * (y2-y1);
-		int slope_error = m - (x2-x1);
-
-		for(int x = x1; x != x2; x+=dirX) {
-			// Desenhando o pixel
-			bufferDeVideo[pospix] = (byte)255;
-			bufferDeVideo[pospix+1] = (byte)255;
-			bufferDeVideo[pospix+2] = (byte)0;
-			bufferDeVideo[pospix+3] = (byte)0;
+	private void bresenhamAlgorithm(int x1, int y1, int x2, int y2, int r, int g, int b) { 
+		int dx = Math.abs(x2 - x1); 
+		int dy = Math.abs(y2 - y1); 
+		
+		// Direção de avanço em X e Y 
+		int sx = (x1 < x2) ? 1 : -1; 
+		int sy = (y1 < y2) ? 1 : -1; 
+		
+		// Erro inicial 
+		int erro = dx - dy; 
+		
+		int e2;
+		
+		while (true) { 
+			// ========================================= 
+			// Desenha o pixel atual 
+			// ========================================= 
+			int pospix = y1 * (W * 4) + x1 * 4; 
 			
-			pospix += 4 * dirX;  // Avançando o pixel horizontalmente
-
-			slope_error += m;  // Atualizando o erro da inclinação
+			bufferDeVideo[pospix] = (byte) 255; 
+			bufferDeVideo[pospix + 1] = (byte) (b & 0xFF); 
+			bufferDeVideo[pospix + 2] = (byte) (g & 0xFF); 
+			bufferDeVideo[pospix + 3] = (byte) (r & 0xFF); 
 			
-			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
-			if(slope_error >= 0) {
-				pospix += W * 4; // Avançando o pixel verticalmente
-				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
-			}
+			// ========================================= 
+			// Verifica se chegou ao ponto final 
+			// ========================================= 
+			
+			if (x1 == x2 && y1 == y2) { 
+				break; 
+			} 
+			
+			// Dobro do erro 
+			e2 = 2 * erro; 
+			
+			// Avanço no eixo X 
+			if (e2 > -dy) { 
+				erro -= dy;
+				x1 += sx; 
+			} 
+			
+			// Avanço no eixo Y 
+			if (e2 < dx) { 
+				erro += dx;
+				y1 += sy; 
+			} 
+		} 
+	}
+	
+	private void borderIntersection(int x0, int y0, int x1, int y1) {
+		int dx = x1 - x0;
+		int dy = y1 - y0;
+		
+		if(dx < 0 && dy < 0) {
+			return;
 		}
 	}
 	
-	// Procedimento de Bresenham para desenhar uma linha entre os pontos (x1, y1) e (x2, y2)
-	private void bresenhamAlgorithmNeg(int x1, int y1, int x2, int y2, int r, int g, int b) {
-		int dirX = 1;
-
-		if(x1 > x2) {  // Se o x1 > x2, a linha vai avançar para a esquerda
-			dirX = -1; 
-		}
-
-		int pospix = y1*(W*4)+x1*4;
-		int m = 2 * (y2-y1);
-		int slope_error = m - (x2-x1);
-
-		for(int x = x1; x != x2; x+=dirX) {
-			// Desenhando o pixel
-			bufferDeVideo[pospix] = (byte)255;
-			bufferDeVideo[pospix+1] = (byte)(b&0xff);
-			bufferDeVideo[pospix+2] = (byte)(g&0xff);
-			bufferDeVideo[pospix+3] = (byte)(r&0xff);
-			
-			pospix += 4 * dirX;  // Avançando o pixel horizontalmente
-
-			slope_error += m;  // Atualizando o erro da inclinação
-			
-			// Se o erro da inclinação for maior ou igual a 0, avançamos o pixel verticalmente
-			if(slope_error <= 0) {
-				pospix -= W * 4; // Avançando o pixel verticalmente
-				slope_error -= 2 * (x2-x1);  // Resetando o erro da inclinação
-			}
-		}
-	}
-
 	public void desenhaLinha(Linha2D linha, int r, int g, int b) {
 		Ponto2D pa = linha.getp0();
 		Ponto2D pb = linha.getp1();
 		
 		if(pa.isValidCoordenates(W, H) && pb.isValidCoordenates(W, H)) {
-			if(pa.getpY() <= pb.getpY()) {
-				bresenhamAlgorithmPos(pa.getpX(), pa.getpY(), pb.getpX(), pb.getpY(), r, g, b);
-			} else {
-				bresenhamAlgorithmNeg(pa.getpX(), pa.getpY(), pb.getpX(), pb.getpY(), r, g, b);
-			}
+			bresenhamAlgorithm(pa.getpX(), pa.getpY(), pb.getpX(), pb.getpY(), r, g, b);
+		} else {
+			
 		}
 	}
 	

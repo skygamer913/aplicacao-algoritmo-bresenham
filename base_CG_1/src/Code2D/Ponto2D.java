@@ -1,7 +1,8 @@
 package Code2D;
 
 public class Ponto2D {
-    private int pX;
+    // Atributos
+	private int pX;
     private int pY;
     private int w;
 
@@ -34,6 +35,8 @@ public class Ponto2D {
     	this.pX = Math.round(matT[0]);
     	this.pY = Math.round(matT[1]);
     }
+    
+    
     
     // Cálculo da posição do pixel
     public int posCalculation(int width, int channel) {
