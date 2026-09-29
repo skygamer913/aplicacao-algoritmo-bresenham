@@ -1,60 +1,65 @@
 package Code3D;
+
 public class Ponto3D {
-    private int pX;
-    private int pY;
-    private int pZ;
+    private float pX;
+    private float pY;
+    private float pZ;
+    private float w;
 
     // Construtor
-    public Ponto3D(int x, int y, int z) {
+    public Ponto3D(float x, float y, float z) {
         this.pX = x;
         this.pY = y;
         this.pZ = z;
+        this.w = 1;
+    }
+
+    public Ponto3D(float x, float y, float z, float w) {
+        this.pX = x;
+        this.pY = y;
+        this.pZ = z;
+        this.w = w;
     }
 
     // Getters
-    public int getpX() {
+    public float getpX() {
         return pX;
     }
 
-    public int getpY() {
+    public float getpY() {
         return pY;
     }
-    
-    public int getpZ() {
-    	return pZ;
+
+    public float getpZ() {
+        return pZ;
     }
 
-    // Setters
-    public void setpX(int pX) {
-        this.pX = pX;
+    public float getW() {
+        return w;
     }
 
-    public void setpY(int pY) {
-        this.pY = pY;
+    public void setX(float x) {
+        this.pX = x;
     }
-    
-    public void setpZ(int pZ) {
-    	this.pZ = pZ;
+
+    public void setY(float y) {
+        this.pY = y;
     }
-    
-    // Função de transformação 2D por matriz
+
+    public void setZ(float z) {
+        this.pZ = z;
+    }
+
+    public void setW(float w) {
+        this.w = w;
+    }
+
     public void transform3D(Matrix3D mat) {
-    	mat.changePoint(this.pX, this.pY, this.pZ);  // Altera as coordenadas do ponto na matriz
-    	
-    	int[] matT = mat.applyTransformation();  // Gera uma matriz do resultado da transformação
-    	
-    	this.pX = matT[0];
-    	this.pY = matT[1];
-    	this.pZ = matT[2];
-    }
-    
-    // Cálculo da posição do pixel
-    public int posCalculation(int width, int channel) {
-        return this.pY * (width * channel) + this.pX * channel;
-    }
+        float[] result = mat.applyTransform((int)pX, (int)pY, (int)pZ, (int)w);
 
-    // Validação da coordenada
-    public boolean isValidCoordenates(int width, int height) {
-        return (this.pX >= 0 && this.pY >= 0) && (this.pX <= width && this.pY <= height);
+        pX = Math.round(result[0]);
+        pY = Math.round(result[1]);
+        pZ = Math.round(result[2]);
+        w = Math.round(result[3]);
     }
 }
