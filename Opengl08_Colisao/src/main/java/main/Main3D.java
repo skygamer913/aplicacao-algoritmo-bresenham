@@ -1,5 +1,6 @@
 package main;
 
+import obj.*;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -10,11 +11,6 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import Model.VboCube;
-import obj.Cubo3D;
-import obj.ObjModel;
-import obj.Object3D;
-import obj.Personagem;
-import obj.Projetil;
 import shaders.StaticShader;
 import util.TextureLoader;
 import util.Utils3D;
@@ -56,8 +52,10 @@ public class Main3D {
 	
 	public static ArrayList<Object3D> listaObjetos = new ArrayList<>();
 	public static ArrayList<Object3D> listaProjeteis = new ArrayList<>();
+	public static ArrayList<Object3D> listaExplosoes = new ArrayList<>();
 	public static Personagem personagem;
 	public static VboCube vbocube = null;
+	public static ObjModel esfera = null;
 	
 	public static int ttverde = -1;
 	
@@ -232,17 +230,21 @@ public class Main3D {
 		
 		System.out.println("f104starfighter.obj");
 		ObjModel f101 = new ObjModel();
-		f101.loadObj("../objs/x-35_obj.obj");
+		f101.loadObj("src/objs/x-35_obj.obj");
 		f101.load();
 		System.out.println("Faces: "+f101.f.size());
 		
 		System.out.println("AIM120D");
 		ObjModel sr71 = new ObjModel();
 		//sr71.loadObj("..\\OBJ\\SR71.obj");
-		sr71.loadObj("..\\objs\\SR71.obj");
+		sr71.loadObj("src/objs/SR71.obj");
 		sr71.load();
 		System.out.println("Faces: "+sr71.f.size());
-		
+
+		esfera = new ObjModel();
+		esfera.loadObj("src/objs/esfera.obj");
+		esfera.load();
+
 		vbocube = new VboCube();
 		vbocube.load();
 		
@@ -261,7 +263,6 @@ public class Main3D {
 		personagem = new Personagem(0, 0, 0, 0.01f);
 		personagem.model = f101;
 		
-		
 		BufferedImage imggato = TextureLoader.loadImage("texturaGato.jpeg");
 		BufferedImage gatorgba = new BufferedImage(imggato.getWidth(), imggato.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		gatorgba.getGraphics().drawImage(imggato, 0, 0, null);
@@ -272,7 +273,11 @@ public class Main3D {
 		
 		BufferedImage imgtverde = TextureLoader.loadImage("tiro_verde.png");
 		ttverde = TextureLoader.loadTexture(imgtverde);
-		
+
+		BufferedImage imgExplosao = TextureLoader.loadImage("cool_explosion.png");
+		BufferedImage explosaoRgba = new BufferedImage(imgExplosao.getWidth(), imgExplosao.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		explosaoRgba.getGraphics().drawImage(imgExplosao, 0, 0, null);
+		int tExplosao = TextureLoader.loadTexture(imgExplosao);
 		
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
@@ -298,7 +303,7 @@ public class Main3D {
 			for(int i = 0; i < listaProjeteis.size();i++) {
 				Projetil proj = (Projetil)listaProjeteis.get(i);
 				proj.SimulaSe(diftime);
-				if(proj.vivo==false) {
+				if(!proj.vivo) {
 					listaProjeteis.remove(i);
 					i--;
 				}
@@ -308,11 +313,21 @@ public class Main3D {
 			for(int i = 0; i < listaObjetos.size();i++) {
 				Object3D obj = listaObjetos.get(i);
 				obj.SimulaSe(diftime);
-				if(obj.vivo==false) {
+				if(!obj.vivo) {
 					listaObjetos.remove(i);
 					i--;
 				}
 			}
+
+			for(int i = 0; i < listaExplosoes.size(); i++) {
+				Explosao3D ex = (Explosao3D) listaExplosoes.get(i);
+				ex.SimulaSe(diftime);
+				if(!ex.vivo) {
+					listaExplosoes.remove(i);
+					i--;
+				}
+			}
+
 			personagem.SimulaSe(diftime);
 			
 			angle+=0.1;
@@ -343,7 +358,6 @@ public class Main3D {
 			int modellocation = glGetUniformLocation(shader.programID, "model");
 			
 			glEnable(GL_DEPTH_TEST);
-			
 
 	        
 	        int projectionloc = glGetUniformLocation(shader.programID, "projection");
@@ -406,7 +420,14 @@ public class Main3D {
 			for(int i = 0; i < listaObjetos.size();i++) {
 				listaObjetos.get(i).DesenhaSe(shader);
 			}
-			
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, tExplosao);
+
+			for(int i = 0; i < listaExplosoes.size(); i++) {
+				listaExplosoes.get(i).DesenhaSe(shader);
+			}
+
 	        glActiveTexture(GL_TEXTURE0);
 	        glBindTexture(GL_TEXTURE_2D, tgato);
 			

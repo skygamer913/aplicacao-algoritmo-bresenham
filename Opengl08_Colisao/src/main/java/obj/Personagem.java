@@ -49,7 +49,6 @@ public class Personagem extends Object3D {
 	public Vector4f front = new Vector4f(0,0,1,1);
 	public Vector4f right = new Vector4f(1,0,0,1);
 	
-	
 	public Personagem(float x, float y, float z, float r) {
 		super(x, y, z);
 		raio = r;
@@ -105,23 +104,11 @@ public class Personagem extends Object3D {
 	public void SimulaSe(long diftime) {
 		super.SimulaSe(diftime);
 		
-//		if(UP) {
-//			z -= velocidade*diftime/1000.0f;
-//		}
-//		if(DOWN) {
-//			z += velocidade*diftime/1000.0f;
-//		}
-//		
-//		if(LEFT) {
-//			x -= velocidade*diftime/1000.0f;
-//		}
-//		if(RIGHT) {
-//			x += velocidade*diftime/1000.0f;
-//		}
-		
-		
 		Matrix4f rotTmp = new Matrix4f();
+		Matrix4f projMat = new Matrix4f();
+		Vector4f projVec = new Vector4f();
 		rotTmp.setIdentity();
+		projMat.setIdentity();
 		if(RIGHT) {
 			rotTmp.rotate(-1.0f*diftime/1000.0f, new Vector3f(up.x, up.y, up.z));
 		}
@@ -155,14 +142,25 @@ public class Personagem extends Object3D {
 		
 		tirotimer+=diftime;
 		if(SHOOT && tirotimer > 100) {
-			Projetil proj = new Projetil(x-0.5f, y-0.1f, z-0.1f, 0.1f);
+			projMat.translate(new Vector3f(x-0.5f, y, z));
+			projMat.transform(projMat, front, projVec);
+			projMat.transform(projMat, right, projVec);
+			projMat.transform(projMat, up, projVec);
+			Projetil proj = new Projetil(projVec.x, projVec.y, projVec.z, 0.1f);
 			
 			proj.vx = front.x*10 + (rnd.nextFloat()*0.8f-0.4f);
 			proj.vy = front.y*10+ (rnd.nextFloat()*0.8f-0.4f);
 			proj.vz = front.z*10+ (rnd.nextFloat()*0.8f-0.4f);
 			proj.texture = Main3D.ttverde;
 			Main3D.listaProjeteis.add(proj);
-			proj = new Projetil(x+0.5f, y-0.1f, z-0.1f, 0.1f);
+
+			projMat.setIdentity();
+			projMat.translate(new Vector3f(x+0.5f, y, z));
+			projMat.transform(projMat, front, projVec);
+			projMat.transform(projMat, right, projVec);
+			projMat.transform(projMat, up, projVec);
+			proj = new Projetil(projVec.x, projVec.y, projVec.z, 0.1f);
+
 			proj.vx = front.x*10+ (rnd.nextFloat()*0.8f-0.4f);
 			proj.vy = front.y*10+ (rnd.nextFloat()*0.8f-0.4f);
 			proj.vz = front.z*10+ (rnd.nextFloat()*0.8f-0.4f);

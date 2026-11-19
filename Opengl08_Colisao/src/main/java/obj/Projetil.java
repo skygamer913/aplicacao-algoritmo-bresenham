@@ -31,7 +31,6 @@ public class Projetil extends Object3D {
 	public float rotvel = 0;
 	float ang = 0;
 	long timer = 0;
-	public boolean vivo = true;
 	public int texture = -1;
 	
 	public Projetil(float x, float y, float z, float r) {
@@ -109,6 +108,7 @@ public class Projetil extends Object3D {
 				vz = vtmp;
 				
 				obj.vivo = false;
+				Main3D.listaExplosoes.add(new Explosao3D(obj.x,obj.y,obj.z,0.01f,0.5f));
 			}
 			
 		}
